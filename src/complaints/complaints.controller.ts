@@ -13,22 +13,22 @@ export class ComplaintsController {
     }
 
     @Get(':id')
-    findOneComplaints(@Param('id', ParseIntPipe) id: number){
+    findOneComplaint(@Param('id', ParseIntPipe) id: number){
         return this.complaintsService.findOne(id)
     }
 
     @Post()
-    createComplaints(@Body() createComplaintsDto: CreateComplaintsDto){
+    createComplaint(@Body() createComplaintsDto: CreateComplaintsDto){
         return this.complaintsService.create(createComplaintsDto)
     }
 
     @Patch(':id')
-    updateComplaints(@Param('id', ParseIntPipe) id: number, @Body() updateComplaintsDto: UpdateComplaintsDto){
+    updateComplaint(@Param('id', ParseIntPipe) id: number, @Body() updateComplaintsDto: UpdateComplaintsDto){
         return this.complaintsService.update(id, updateComplaintsDto)
     }
 
     @Delete(':id')
-    removeComplaints(@Param('id', ParseIntPipe) id: number){
+    removeComplaint(@Param('id', ParseIntPipe) id: number){
         return this.complaintsService.remove(id)
     }
 }

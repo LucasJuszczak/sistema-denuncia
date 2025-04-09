@@ -8,9 +8,9 @@ uma determinada camada aceita e trabalha
 import { IsNotEmpty, IsString, MaxLength } from "class-validator"
 
 export class CreateComplaintsDto{
-    @IsString({message:"The name field must be text!"})
-    @IsNotEmpty({message:"The name field can't be empty!"})
-    @MaxLength(60, {message:"The name field must have a maximum of 60 characters!"})
+    @IsString({message:"The title field must be text!"})
+    @IsNotEmpty({message:"The title field can't be empty!"})
+    @MaxLength(60, {message:"The title field must have a maximum of 60 characters!"})
     readonly title: string
 
     @IsString({message:"The description field must be text!"})
