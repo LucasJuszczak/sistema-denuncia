@@ -1,67 +1,95 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Tags } from './entities/tags.entity';
 import { CreateTagsDto } from './dto/create-tags.dto';
 import { UpdateTagsDto } from './dto/update-tags.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class TagsService {
-    // Lista de memória
-    private tags: Tags[] = [
-        {
-            id: 1,
-            name: "Tag 01"
+    constructor(private readonly prisma: PrismaService){}
+
+    async findAll(paginationDto: PaginationDto){
+        const {limit = 10, offset = 0} = paginationDto
+        const allTags = await this.prisma.tag.findMany({
+            take:limit,
+            skip: offset,
+            orderBy:{createdAt: 'desc'}
+        })
+        return allTags
+    }
+
+    async findOne(id: number){
+        const tag = await this.prisma.tag.findFirst({
+            where: {id: id},
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                complaint: true
+            }
+        })
+
+        if(tag) return tag
+
+        throw new HttpException("Tag not found!", HttpStatus.NOT_FOUND)
+    }
+    
+    async create(createTagsDto: CreateTagsDto){
+        try{
+            const newTag = await this.prisma.tag.create({
+                data: {
+                    name: createTagsDto.name,
+                    description: createTagsDto.description
+                },
+                select:{
+                    id: true,
+                    name: true,
+                    description: true
+                }
+            })
+            return newTag
+        }catch(e){
+            throw new HttpException("Unable to create tag!", HttpStatus.BAD_REQUEST)
         }
-    ]
-
-    findAll(){
-        return this.tags
     }
 
-    findOne(id: number){
-        const tags = this.tags.find(tags => tags.id === id)
+    async update(id: number, updateTagsDto: UpdateTagsDto){
+        try{
+            const findTag = await this.prisma.tag.findFirst({
+                where: {id: id}
+            })
 
-        if(tags) return tags
+            if (!findTag)
+                throw new HttpException("This tag doesn't exist!", HttpStatus.NOT_FOUND)
 
-        throw new HttpException("This tag doesn't exist!", HttpStatus.NOT_FOUND)
-    }
-
-    create(createTagsDto: CreateTagsDto){
-        const newId = this.tags.length + 1
-
-        const newTags = {
-            id: newId,
-            ...createTagsDto
+            const tag = await this.prisma.tag.update({
+                where: {id: findTag.id},
+                data: {
+                    name: updateTagsDto.name ? updateTagsDto.name : findTag.name,
+                    description: updateTagsDto.description ? updateTagsDto.description : findTag.description
+                }
+            })
+            return tag
+        } catch(e){
+            throw new HttpException("Unable to update tag!", HttpStatus.BAD_REQUEST)
         }
-
-        this.tags.push(newTags)
-
-        return newTags
     }
 
-    update(id: number, updateTagsDto: UpdateTagsDto){
-        const tagIndex = this.tags.findIndex(tag => tag.id === id)
+    async delete(id: number){
+        try{
+            const findTag = await this.prisma.tag.findFirst({
+                where: {id: id}
+            })
 
-        if(tagIndex < 0)
-            throw new HttpException("This tag doesn't exist!", HttpStatus.NOT_FOUND)
-        
-        const tagItem = this.tags[tagIndex]
+            if(!findTag)
+                throw new HttpException("This tag doesn't exist!", HttpStatus.NOT_FOUND)
 
-        this.tags[tagIndex] = {
-            ...tagItem,
-            ...updateTagsDto
+            await this.prisma.tag.delete({
+                where: {id: findTag.id}
+            })
+            return "Deleted tag sucessfully!"
+        } catch(e){
+            throw new HttpException("Unable to delete tag!", HttpStatus.BAD_REQUEST)
         }
-
-        return "Updated tag!!"
-    }
-
-    remove(id: number){
-        const tagIndex = this.tags.findIndex(tag => tag.id === id)
-
-        if(tagIndex < 0)
-            throw new HttpException("This tag doesn't exist!", HttpStatus.NOT_FOUND)
-        
-        this.tags.splice(tagIndex, 1)
-
-        return "Deleted tag!!!"
     }
 }

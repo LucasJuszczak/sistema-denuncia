@@ -1,15 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ComplaintsService } from './complaints.service';
 import { CreateComplaintsDto } from './dto/create-complaints.dto';
 import { UpdateComplaintsDto } from './dto/update-complaints.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('complaints')
 export class ComplaintsController {
     constructor(private readonly complaintsService: ComplaintsService) {}
 
     @Get()
-    findAllComplaints(){
-        return this.complaintsService.findAll()
+    findAllComplaints(@Query() paginationDto: PaginationDto){
+        return this.complaintsService.findAll(paginationDto)
     }
 
     @Get(':id')
@@ -29,6 +30,6 @@ export class ComplaintsController {
 
     @Delete(':id')
     removeComplaint(@Param('id', ParseIntPipe) id: number){
-        return this.complaintsService.remove(id)
+        return this.complaintsService.delete(id)
     }
 }

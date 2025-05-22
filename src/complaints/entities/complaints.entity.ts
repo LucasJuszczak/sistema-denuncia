@@ -5,4 +5,6 @@ export class Complaints{
     description: string
     location: string
     completed: boolean
+    createdAt?: Date
+    updatedAt?: Date
 }

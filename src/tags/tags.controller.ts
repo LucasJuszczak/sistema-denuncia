@@ -1,15 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { CreateTagsDto } from './dto/create-tags.dto';
 import { UpdateTagsDto } from './dto/update-tags.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('tags')
 export class TagsController {
     constructor(private readonly tagsService: TagsService) { }
 
     @Get()
-    findAllTags(){
-        return this.tagsService.findAll()
+    findAllTags(@Query() paginationDto: PaginationDto){
+        return this.tagsService.findAll(paginationDto)
     }
 
     @Get(':id')
@@ -29,6 +30,6 @@ export class TagsController {
 
     @Delete(':id')
     removeTag(@Param('id', ParseIntPipe) id: number){
-        return this.tagsService.remove(id)
+        return this.tagsService.delete(id)
     }
 }

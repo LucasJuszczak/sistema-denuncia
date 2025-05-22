@@ -5,7 +5,7 @@ Objetivo: Validar dados, transformar.
 uma determinada camada aceita e trabalha
 */
 
-import { IsNotEmpty, IsString, MaxLength } from "class-validator"
+import { IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator"
 
 export class CreateComplaintsDto{
     @IsString({message:"The title field must be text!"})
@@ -22,4 +22,8 @@ export class CreateComplaintsDto{
     @IsNotEmpty({message:"The location field can't be empty!"})
     @MaxLength(80, {message:"The location field must be a maximum of 80 characters!"})
     readonly location: string
+
+    @IsNumber()
+    @IsNotEmpty()
+    readonly tagId: number
 }
